@@ -10,7 +10,8 @@ const StoreProducts = () => {
   const [store, setStore] = useState<IStore>(); // State for store details
   const [products, setProducts] = useState<IProduct[]>([]); // State for product list
   const [loading, setLoading] = useState(true); // State for loading
-  const categories = ["Fruits", "Vegetables", "Dairy", "Beverages", "Snacks", "Bakery"]; // Sample categories
+  const [categories, setCategories] = useState<ICategory[]>([]); // Sample categories
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // State for selected category
 
   useEffect(() => {
     // Fetch store details and products
@@ -24,6 +25,7 @@ const StoreProducts = () => {
           // Assuming response contains store data and products
           setStore(response.store); // Set store details
           setProducts(response.products); // Set products list
+          setCategories(response?.category);
 
           console.log("Fetched store details:", response);
         } catch (error) {
@@ -41,6 +43,11 @@ const StoreProducts = () => {
     return <div className="text-center py-4">Loading...</div>; // Show loading state
   }
 
+  // Filter products based on the selected category
+  const filteredProducts = selectedCategory
+    ? products.filter((product) => product.category === selectedCategory)
+    : products;
+
   return (
     <div className="flex flex-col min-h-screen">
       <div className="p-4 flex-grow">
@@ -50,36 +57,37 @@ const StoreProducts = () => {
             <p className="text-gray-600">{store?.address}</p>
           </div>
         )}
-  {/* Horizontal Scrollable Categories */}
-  <div className="overflow-x-auto whitespace-nowrap mb-4">
-          {categories.map((category, index) => (
+        {/* Horizontal Scrollable Categories */}
+        <div className="overflow-x-auto whitespace-nowrap mb-4">
+          <div
+            onClick={() => setSelectedCategory(null)} // Allow to show all products
+            className={`inline-block py-2 px-4 rounded-lg mr-2 cursor-pointer transition duration-300 
+              ${selectedCategory === null
+                ? "bg-black text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+          >
+            All Products
+          </div>
+          {categories.map((category, index: number) => (
             <div
               key={index}
-              className="inline-block bg-black text-white py-2 px-4 rounded-lg mr-2 cursor-pointer hover:bg-gray-700 transition duration-300"
+              onClick={() => setSelectedCategory(category._id)} // Set selected category on click
+              className={`inline-block py-2 px-4 rounded-lg mr-2 cursor-pointer transition duration-300 
+                ${selectedCategory === category._id
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
             >
-              {category}
+              {category?.name}
             </div>
           ))}
+
         </div>
 
         <h2 className="text-xl font-semibold mb-4">Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-[90vh]">
-          {products.map((item) => (
-            <ProductCard key={item?._id} product={item} />
-          ))}
-            {products.map((item) => (
-            <ProductCard key={item?._id} product={item} />
-          ))}
-            {products.map((item) => (
-            <ProductCard key={item?._id} product={item} />
-          ))}
-              {products.map((item) => (
-            <ProductCard key={item?._id} product={item} />
-          ))}
-            {products.map((item) => (
-            <ProductCard key={item?._id} product={item} />
-          ))}
-            {products.map((item) => (
+          {filteredProducts.map((item) => (
             <ProductCard key={item?._id} product={item} />
           ))}
         </div>

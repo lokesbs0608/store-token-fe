@@ -22,7 +22,7 @@ const getStoreProduct = async (id: unknown) => {
 
 // Function to handle Axios errors
 const handleAxiosError = (error: AxiosError) => {
-   
+
     if (error.response) {
         // The request was made and the server responded with a status code
 
